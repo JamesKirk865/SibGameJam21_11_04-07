@@ -77,6 +77,9 @@ public Sprite on,off;
 			Jlen=0;
 			jumped=false;
 		}
+		if(Input.GetKey(KeyCode.Escape)){
+			Application.Quit();
+		}
 		if(leg.IsTouchingLayers(fl)&(pRB.velocity.y==0)){
 			anim.SetBool("jump",false);
 		}
@@ -95,7 +98,6 @@ public Sprite on,off;
 					--tape;
 					icon[tape].sprite=off;
 					can=false;
-					//Cursor.visible=true;
 					ren.material=defaultM;
 				}
 			}
@@ -111,7 +113,6 @@ public Sprite on,off;
 				ren.material=blue;
 				place=true;
 				can=true;
-				//Cursor.visible=false;
 			}
 		}
 		
