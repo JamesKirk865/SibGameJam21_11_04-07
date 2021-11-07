@@ -8,6 +8,7 @@ TagManager:
   - flat
   - move
   - boostX2jump
+  - trigger
   layers:
   - Default
   - TransparentFX
@@ -48,6 +49,6 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: UIup
+  - name: front
     uniqueID: 3114205875
     locked: 0

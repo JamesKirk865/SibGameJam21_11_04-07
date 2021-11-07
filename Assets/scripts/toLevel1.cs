@@ -41,6 +41,9 @@ private bool lvl1;
 			--dTick;
 		}
 		if(dTick==0){
+			if(GameObject.Find("mainMenu")){
+				GameObject.Find("ost").GetComponent<AudioSource>().Play();
+			}
 			SceneManager.LoadScene("level1");
 		}
 		if(dStick>0){

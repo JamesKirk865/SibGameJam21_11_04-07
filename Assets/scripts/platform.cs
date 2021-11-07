@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class platform : MonoBehaviour{
-	public float ticks;
-	private float dT;
-	private int was,cur;
-	private bool crack;
-	private GameObject player;
-	public float r;
-	public bool alive;
-	public Material red,blue;
-	public Sprite[]list=new Sprite[5];
-	private SpriteRenderer Sren;
-	public int stage=5;
+public float ticks;
+private float dT;
+private int was,cur;
+private bool crack,newP;
+private GameObject player;
+public float r;
+public bool alive;
+public Material red,blue;
+public Sprite[]list=new Sprite[5];
+private SpriteRenderer Sren;
+public int stage=5;
+public AudioSource Aplace,Abreak;
+public GameObject Pbreak;
+	
     void Start(){
+		newP=false;
 		crack=false;
 		Sren=GetComponent<SpriteRenderer>();
 		player=GameObject.Find("player");
@@ -29,6 +33,10 @@ public class platform : MonoBehaviour{
 
     void FixedUpdate(){
 		if(alive){
+			if(newP){
+				Aplace.Play();
+				newP=false;
+			}
 			if(crack){
 				--dT;
 				cur=(int)((ticks-dT)/(ticks/6));
@@ -37,13 +45,17 @@ public class platform : MonoBehaviour{
 					was=cur;
 				}
 				if(dT==1){
+					Abreak.Play();
 					Destroy(gameObject);
+					Instantiate(Pbreak,gameObject.transform.position,Quaternion.identity);
 				}
 			}else{
 				if((gameObject.transform.position.y-player.transform.position.y)<r){
 					crack=true;
 				}
 			}
+		}else{
+			newP=true;
 		}
     }
 	

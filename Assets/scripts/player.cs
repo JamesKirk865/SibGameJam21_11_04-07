@@ -8,17 +8,19 @@ public float speed,jump;
 private Rigidbody2D pRB;
 private BoxCollider2D leg;
 [SerializeField] private LayerMask fl;
-private int tape=0,Jlen=0;
+private int Jlen=0,tape=0;
 private Vector3 mouse;
 private GameObject newPlat;
-private bool place,triggered,boostX2,jumped,jumpedX2;
+private bool triggered,boostX2,jumped,jumpedX2,playd,pld;
 public Renderer ren;
-public bool can;
+public bool place,can,end;
 public Texture2D curT;
 private Animator anim;
 public Material blue,red,defaultM;
 public Image[]icon=new Image[5];
 public Sprite on,off;
+public AudioSource Awalk,Ajump1,Ajump2,Aequip;
+public GameObject Prun,Pjump,Ptake,Pbuild;
 
 	void Start(){
         pRB=gameObject.GetComponent<Rigidbody2D>();
@@ -30,12 +32,19 @@ public Sprite on,off;
 		for(int i=0;i<5;++i){
 			icon[i].sprite=off;
 		}
+		playd=false;
+		pld=false;
     }
 
     void FixedUpdate(){
 		triggered=false;
 		if(Input.GetAxis("Horizontal")!=0){
 			anim.SetBool("walk",true);
+			Instantiate(Prun,gameObject.transform.position,Quaternion.identity);
+			if(!pld&playd){
+				Awalk.Play();
+				pld=true;
+			}
 			if(Input.GetAxis("Horizontal")>0){
 				pRB.velocity=new Vector2(speed,pRB.velocity.y);
 				gameObject.GetComponent<SpriteRenderer>().flipX=false;
@@ -46,6 +55,8 @@ public Sprite on,off;
 		}else{
 			pRB.velocity=new Vector2(0,pRB.velocity.y);
 			anim.SetBool("walk",false);
+			Awalk.Stop();
+			pld=false;
 		}
 		if(Input.GetKey(KeyCode.Space)){
 			if(leg.IsTouchingLayers(fl)){
@@ -54,6 +65,11 @@ public Sprite on,off;
 				jumped=true;
 				jumpedX2=false;
 				anim.SetBool("jump",true);
+				Destroy(GameObject.Find("Run(Clone)"));
+				Instantiate(Pjump,gameObject.transform.position,Quaternion.identity);
+				Ajump1.Play();
+				Awalk.Stop();
+				pld=false;
 			}else{
 				if(Jlen>0){
 					++Jlen;
@@ -67,6 +83,9 @@ public Sprite on,off;
 							if(!jumpedX2){
 								pRB.velocity=new Vector2(pRB.velocity.x,jump);
 								jumped=true;
+								Ajump1.Play();
+								Awalk.Stop();
+								pld=false;
 								jumpedX2=true;
 							}
 						}
@@ -82,6 +101,12 @@ public Sprite on,off;
 		}
 		if(leg.IsTouchingLayers(fl)&(pRB.velocity.y==0)){
 			anim.SetBool("jump",false);
+			if(!playd){
+				Ajump2.Play();
+				playd=true;
+			}
+		}else{
+			playd=false;
 		}
 		if(place){
 			mouse=Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -99,6 +124,7 @@ public Sprite on,off;
 					icon[tape].sprite=off;
 					can=false;
 					ren.material=defaultM;
+					Instantiate(Pbuild,newPlat.transform.position,Quaternion.identity);
 				}
 			}
 		}else{
@@ -115,7 +141,10 @@ public Sprite on,off;
 				can=true;
 			}
 		}
-		
+		/*if(end){
+			Destroy(newPlat);
+			tape=0;
+		}*/
     }
 	
 	void OnTriggerEnter2D(Collider2D coll){
@@ -124,10 +153,15 @@ public Sprite on,off;
 			++tape;
 			Destroy(coll.gameObject);
 			triggered=true;
+			Aequip.Play();
+			Instantiate(Ptake,coll.gameObject.transform.position,Quaternion.identity);
 		}
 		if(coll.gameObject.tag=="boostX2jump"){
 			boostX2=true;
 			Destroy(coll.gameObject);
+		}
+		if(coll.gameObject.tag=="trigger"){
+			GameObject.Find("ost").GetComponent<AudioSource>().Stop();
 		}
 	}
 	
